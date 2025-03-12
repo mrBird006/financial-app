@@ -21,10 +21,22 @@ app.get('/', (req, res) => {
 
 app.post('/api/v1/speech-to-data', upload.none(), async (req, res) => {
     try {
-        const audio = base64ToMemoryFile(req.body.audio);
+        const audio = base64ToMemoryFile();
         const transcription = await transcriber.transcribe(audio);
         const structure = await promptChainer.processChain(transcription);
         structure.context.description = transcription;
+        console.log(structure);
+        res.json({ message: "success", data: structure });
+    } catch (error) {req.body.audio
+        console.error(error);
+        res.status(500).send('Error transcribing audio');
+    }
+});
+app.post('/api/v1/description-to-data',upload.none(),  async (req, res) => {
+    try {
+        console.log(req.body);
+        const description = req.body.description;
+        const structure = await promptChainer.processChain(description);
         console.log(structure);
         res.json({ message: "success", data: structure });
     } catch (error) {
